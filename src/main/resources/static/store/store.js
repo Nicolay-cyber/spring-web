@@ -21,5 +21,13 @@ angular.module('market-front').controller('storeController', function ($scope, $
             });
     }
 
+    $scope.loadOrders = function () {
+        $http.get(contextPath + 'api/v1/orders')
+            .then(function (response) {
+                $scope.MyOrders = response.data;
+            });
+    }
+
     $scope.loadProducts();
+    $scope.loadOrders();
 });
