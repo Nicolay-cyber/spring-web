@@ -1,5 +1,7 @@
 package com.geekbrains.spring.web.entities;
 
+import com.geekbrains.spring.web.converters.CategoryConverter;
+import com.geekbrains.spring.web.dto.CategoryDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,6 +27,10 @@ public class Product {
     @Column(name = "price")
     private Integer price;
 
+    @ManyToOne()
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -33,9 +39,14 @@ public class Product {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Product(Long id, String title, Integer price) {
+    public Product(Long id, String title, Integer price, CategoryDto categoryDto) {
         this.id = id;
         this.title = title;
         this.price = price;
+        this.category = new CategoryConverter().categoryFromDto(categoryDto);
     }
+    public CategoryDto getCategory(){
+        return new CategoryConverter().dtoFromCategory(category);
+    }
+
 }

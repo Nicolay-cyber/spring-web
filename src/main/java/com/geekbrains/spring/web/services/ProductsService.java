@@ -1,6 +1,9 @@
 package com.geekbrains.spring.web.services;
 
+import com.geekbrains.spring.web.converters.CategoryConverter;
+import com.geekbrains.spring.web.dto.CategoryDto;
 import com.geekbrains.spring.web.dto.ProductDto;
+import com.geekbrains.spring.web.entities.Category;
 import com.geekbrains.spring.web.entities.Product;
 import com.geekbrains.spring.web.exceptions.ResourceNotFoundException;
 import com.geekbrains.spring.web.repositories.ProductsRepository;
@@ -18,8 +21,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductsService {
     private final ProductsRepository productsRepository;
+    private final CategoryService categoryService;
+    private final CategoryConverter categoryConverter;
 
-    public Page<Product> findAll(Integer minPrice, Integer maxPrice, String partTitle, Integer page) {
+    public Page<Product> findAll(Integer minPrice, Integer maxPrice, String partTitle, String categoryName, Integer page) {
         Specification<Product> spec = Specification.where(null);
         if (minPrice != null) {
             spec = spec.and(ProductsSpecifications.priceGreaterOrEqualsThan(minPrice));
@@ -29,6 +34,10 @@ public class ProductsService {
         }
         if (partTitle != null) {
             spec = spec.and(ProductsSpecifications.titleLike(partTitle));
+        }
+        if(categoryName != null){
+            Category category = categoryService.findByName(categoryName).orElseThrow(() -> new ResourceNotFoundException("Категория не найдена, имя:" + categoryName));
+            spec = spec.and(ProductsSpecifications.categoryEqual(category));
         }
 
         return productsRepository.findAll(spec, PageRequest.of(page - 1, 50));

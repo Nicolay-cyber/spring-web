@@ -1,16 +1,34 @@
-create table products
+create table categories
 (
-    id         bigserial primary key,
-    title      varchar(255),
-    price      int,
-    created_at timestamp default current_timestamp,
-    updated_at timestamp default current_timestamp
+    id   bigserial primary key,
+    name varchar(255)
 );
 
-insert into products (title, price)
-values ('Milk', 100),
-       ('Bread', 80),
-       ('Cheese', 90);
+insert into categories(name)
+values ('Products'),
+       ('Clothes'),
+       ('Electronics');
+
+create table products
+(
+    id          bigserial primary key,
+    title       varchar(255),
+    price       int,
+    category_id bigint not null references categories (id),
+    created_at  timestamp default current_timestamp,
+    updated_at  timestamp default current_timestamp
+);
+
+insert into products (title, price, category_id)
+values ('Milk', 100, 1),
+       ('Bread', 80, 1),
+       ('Cheese', 90, 1),
+       ('Skirt', 1000, 2),
+       ('Shorts', 1500, 2),
+       ('Paints', 2500, 2),
+       ('Keyboard', 800, 3),
+       ('Mouse', 500, 3),
+       ('TV', 10000, 3);
 
 create table users
 (
