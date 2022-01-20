@@ -1,7 +1,6 @@
 package com.geekbrains.spring.web.services;
 
 import com.geekbrains.spring.web.converters.CategoryConverter;
-import com.geekbrains.spring.web.dto.CategoryDto;
 import com.geekbrains.spring.web.dto.ProductDto;
 import com.geekbrains.spring.web.entities.Category;
 import com.geekbrains.spring.web.entities.Product;
@@ -15,7 +14,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +47,26 @@ public class ProductsService {
 
     public Optional<Product> findById(Long id) {
         return productsRepository.findById(id);
+    }
+
+    public com.geekbrains.spring.web.soap.products.Product getById(Long id){
+        return productsRepository.findById(id).map(functionEntityToSoap).get();
+    }
+    public static final Function<Product, com.geekbrains.spring.web.soap.products.Product> functionEntityToSoap = se -> {
+        com.geekbrains.spring.web.soap.products.Product product = new com.geekbrains.spring.web.soap.products.Product();
+        product.setId(se.getId());
+        product.setTitle(se.getTitle());
+        product.setCost(se.getPrice());
+        product.setCategory(se.getCategory().getName());
+        return product;
+    };
+
+    public com.geekbrains.spring.web.soap.products.Product getByTitle(String title){
+        return productsRepository.findByTitle(title).map(functionEntityToSoap).get();
+    }
+
+    public List<com.geekbrains.spring.web.soap.products.Product> getAllProducts() {
+        return productsRepository.findAll().stream().map(functionEntityToSoap).collect(Collectors.toList());
     }
 
     public void deleteById(Long id) {
